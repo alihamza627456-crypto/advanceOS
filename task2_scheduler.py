@@ -42,3 +42,14 @@ def load_jobs():
 
     return jobs
 
+
+# Function to save the current queue back to file
+def save_jobs(jobs):
+    with open(QUEUE_FILE, "w") as f:
+        for job in jobs:
+            f.write(f"{job['student_id']},{job['job_name']},{job['exec_time']},{job['priority']}\n")
+
+# Function to add a completed job to completed_jobs.txt
+def append_completed(job):
+    with open(COMPLETED_FILE, "a") as f:
+        f.write(f"{job['student_id']},{job['job_name']},{job['exec_time']},{job['priority']}\n")
