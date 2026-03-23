@@ -117,3 +117,48 @@ show_top_processes() {
 
     log_action "Displayed top 10 memory consuming processes"
 }
+
+
+# Function to safely terminate a process
+terminate_process() {
+    read -p "Enter PID to terminate: " pid
+
+    # Validate that PID contains only numbers
+    if ! [[ "$pid" =~ ^[0-9]+$ ]]; then
+        echo "Invalid PID."
+        log_action "Invalid PID entered for termination: $pid"
+        return
+    fi
+
+    # Check if PID exists
+    if ! process_exists "$pid"; then
+        echo "Process does not exist."
+        log_action "Attempted termination of non-existent PID: $pid"
+        return
+    fi
+
+    # Prevent killing critical processes
+    for critical in $CRITICAL_PIDS; do
+        if [ "$pid" -eq "$critical" ]; then
+            echo "Cannot terminate critical system process: PID $pid"
+            log_action "Blocked attempt to terminate critical PID $pid"
+            return
+        fi
+    done
+
+    # Ask for confirmation before termination
+    read -p "Are you sure you want to terminate PID $pid? (Y/N): " confirm
+
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        if terminate_pid "$pid"; then
+            echo "Process $pid terminated successfully."
+            log_action "Terminated process PID $pid"
+        else
+            echo "Failed to terminate process PID $pid"
+            log_action "Failed to terminate process PID $pid"
+        fi
+    else
+        echo "Termination cancelled."
+        log_action "Cancelled termination of PID $pid"
+    fi
+}
