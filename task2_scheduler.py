@@ -174,3 +174,63 @@ def process_priority():
 
     print("All jobs processed using Priority Scheduling.")
 
+
+# Function to display completed jobs
+def view_completed_jobs():
+    if not os.path.exists(COMPLETED_FILE) or os.path.getsize(COMPLETED_FILE) == 0:
+        print("No completed jobs.")
+        return
+
+    print("\n===== Completed Jobs =====")
+    with open(COMPLETED_FILE, "r") as f:
+        for i, line in enumerate(f, 1):
+            student_id, job_name, exec_time, priority = line.strip().split(",")
+            print(
+                f"{i}. Student ID: {student_id}, "
+                f"Job Name: {job_name}, "
+                f"Execution Time: {exec_time}s, "
+                f"Priority: {priority}"
+            )
+
+
+# Function to exit with confirmation
+def exit_system():
+    confirm = input("Bye? Confirm exit (Y/N): ").strip().lower()
+
+    if confirm == "y":
+        print("Goodbye.")
+        exit()
+    else:
+        print("Exit cancelled.")
+
+# Main menu loop
+def menu():
+    while True:
+        print("\n===== University High Performance Computing Job Scheduler =====")
+        print("1. View pending jobs")
+        print("2. Submit a job request")
+        print("3. Process job queue using Round Robin")
+        print("4. Process job queue using Priority Scheduling")
+        print("5. View completed jobs")
+        print("6. Bye")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            view_pending_jobs()
+        elif choice == "2":
+            submit_job()
+        elif choice == "3":
+            process_round_robin()
+        elif choice == "4":
+            process_priority()
+        elif choice == "5":
+            view_completed_jobs()
+        elif choice == "6":
+            exit_system()
+        else:
+            print("Invalid option. Please try again.")
+
+# Program entry point
+if __name__ == "__main__":
+    menu()
