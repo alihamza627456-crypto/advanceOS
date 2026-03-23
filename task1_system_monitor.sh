@@ -33,3 +33,15 @@ show_cpu_usage() {
         echo "CPU usage command not available in this environment."
     fi
 }
+
+
+# Function to display memory usage with Linux and Windows fallbacks
+show_memory_usage() {
+    if command_exists free; then
+        free -h
+    elif command_exists powershell; then
+        powershell -NoProfile -Command '$os = Get-CimInstance Win32_OperatingSystem; $total = [math]::Round($os.TotalVisibleMemorySize/1024/1024,2); $free = [math]::Round($os.FreePhysicalMemory/1024/1024,2); $used = [math]::Round($total - $free,2); Write-Output ("Total: " + $total + " GB"); Write-Output ("Used : " + $used + " GB"); Write-Output ("Free : " + $free + " GB")'
+    else
+        echo "Memory usage command not available in this environment."
+    fi
+}
