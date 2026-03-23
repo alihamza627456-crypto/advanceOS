@@ -53,3 +53,22 @@ def save_jobs(jobs):
 def append_completed(job):
     with open(COMPLETED_FILE, "a") as f:
         f.write(f"{job['student_id']},{job['job_name']},{job['exec_time']},{job['priority']}\n")
+
+
+# Function to display all pending jobs
+def view_pending_jobs():
+    jobs = load_jobs()
+
+    if not jobs:
+        print("No pending jobs.")
+        return
+
+    print("\n===== Pending Jobs =====")
+    for i, job in enumerate(jobs, 1):
+        print(
+            f"{i}. Student ID: {job['student_id']}, "
+            f"Job Name: {job['job_name']}, "
+            f"Execution Time: {job['exec_time']}s, "
+            f"Priority: {job['priority']}"
+        )
+
