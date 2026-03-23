@@ -99,3 +99,21 @@ show_system_usage() {
 
     log_action "Displayed CPU and memory usage"
 }
+
+
+# Function to display the top 10 memory consuming processes
+show_top_processes() {
+    echo "===== Top 10 Memory Consuming Processes ====="
+
+    # Prefer GNU/Linux ps output when available.
+    if ps -eo pid,user,%cpu,%mem,comm --sort=-%mem >/dev/null 2>&1; then
+        ps -eo pid,user,%cpu,%mem,comm --sort=-%mem | head -n 11
+    # Fallback for Windows/Git Bash environments where ps options differ.
+    elif command_exists powershell; then
+        powershell -NoProfile -Command 'Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 10 @{Name="PID";Expression={$_.Id}}, @{Name="Name";Expression={$_.ProcessName}}, @{Name="MemoryMB";Expression={[math]::Round($_.WorkingSet64/1MB,2)}} | Format-Table -AutoSize'
+    else
+        echo "Cannot list top memory processes in this environment."
+    fi
+
+    log_action "Displayed top 10 memory consuming processes"
+}
