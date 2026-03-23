@@ -45,3 +45,57 @@ show_memory_usage() {
         echo "Memory usage command not available in this environment."
     fi
 }
+
+
+# Function to return directory size in bytes with fallback
+get_dir_size_bytes() {
+    local dir="$1"
+
+    if du -sb "$dir" >/dev/null 2>&1; then
+        du -sb "$dir" 2>/dev/null | awk '{print $1}'
+    else
+        du -sk "$dir" 2>/dev/null | awk '{print $1 * 1024}'
+    fi
+}
+
+
+# Function to check process existence with Linux and Windows fallbacks
+process_exists() {
+    local pid="$1"
+
+    if ps -p "$pid" >/dev/null 2>&1; then
+        return 0
+    elif command_exists powershell; then
+        powershell -NoProfile -Command "if (Get-Process -Id $pid -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }" >/dev/null 2>&1
+        return $?
+    else
+        return 1
+    fi
+}
+
+
+# Function to terminate a process with Linux and Windows fallbacks
+terminate_pid() {
+    local pid="$1"
+
+    if kill "$pid" >/dev/null 2>&1; then
+        return 0
+    elif command_exists powershell; then
+        powershell -NoProfile -Command "try { Stop-Process -Id $pid -Force -ErrorAction Stop; exit 0 } catch { exit 1 }" >/dev/null 2>&1
+        return $?
+    else
+        return 1
+    fi
+}
+
+# Function to display current CPU and memory usage
+show_system_usage() {
+    echo "===== Current CPU Usage ====="
+    show_cpu_usage
+
+    echo
+    echo "===== Current Memory Usage ====="
+    show_memory_usage
+
+    log_action "Displayed CPU and memory usage"
+}
