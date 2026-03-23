@@ -129,3 +129,30 @@ check_existing_submission() {
 
     echo "No duplicate found."
 }
+
+# Function to launch the Python login monitoring system
+simulate_login() {
+    local venv_python="$SCRIPT_DIR/../.venv/Scripts/python.exe"
+
+    if [ -f "$venv_python" ]; then
+        "$venv_python" "$SCRIPT_DIR/task3_login_monitor.py"
+    elif command_exists python3; then
+        python3 "$SCRIPT_DIR/task3_login_monitor.py"
+    elif command_exists python; then
+        python "$SCRIPT_DIR/task3_login_monitor.py"
+    else
+        echo "Python is not available in this environment."
+    fi
+}
+
+# Function to exit with confirmation
+exit_system() {
+    read -p "Bye? Confirm exit (Y/N): " confirm
+
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        echo "Goodbye."
+        exit 0
+    else
+        echo "Exit cancelled."
+    fi
+}
