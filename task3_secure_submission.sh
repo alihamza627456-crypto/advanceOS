@@ -23,3 +23,19 @@ log_action() {
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
+
+# Normalize Windows-style paths (e.g., D:\folder\file.pdf) for Bash checks
+normalize_input_path() {
+    local input_path="$1"
+
+    if command_exists cygpath; then
+        cygpath -u "$input_path" 2>/dev/null || printf '%s' "$input_path"
+    elif [[ "$input_path" =~ ^[A-Za-z]:\\ ]]; then
+        local drive_letter="${input_path:0:1}"
+        local remaining_path="${input_path:2}"
+        remaining_path="${remaining_path//\\//}"
+        printf '/%s/%s' "$(echo "$drive_letter" | tr 'A-Z' 'a-z')" "$remaining_path"
+    else
+        printf '%s' "$input_path"
+    fi
+}
